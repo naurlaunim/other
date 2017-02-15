@@ -1,16 +1,27 @@
 from tkinter import *
 import random
+import pickle
 
 class ToDoList:
     def __init__(self, *args):
-        self.urgent = list(args)
-        self.long_term = []
+        try:
+            f1 = open('urgent_list.txt', 'rb')
+            self.urgent = pickle.load(f1) + list(args)
+        except FileNotFoundError:
+            self.urgent = list(args)
+        try:
+            f2 = open('long_time_list.txt', 'rb')
+            self.long_term = pickle.load(f2)
+        except FileNotFoundError:
+            self.long_term = []
+
         self.root = Tk()
         self.current = StringVar()
         self.str = StringVar()
         self.start()
         self.make_widgets()
         self.root.mainloop()
+
 
     def make_widgets(self):
         self.left_frame = Frame(self.root)
@@ -34,36 +45,42 @@ class ToDoList:
 
     def start(self):
         if self.urgent != []:
-            i = random.choice(range(len(self.urgent)))
-            self.current.set(self.urgent[i])
-            del self.urgent[i]
+            self.set_new(self.urgent, 'urgent_list.txt')
         else:
             self.current.set('')
 
     def done(self):
         if self.urgent != []:
-            i = random.choice(range(len(self.urgent)))
-            self.current.set(self.urgent[i])
-            del self.urgent[i] ##
+            self.set_new(self.urgent, 'urgent_list.txt')
             self.task_message.configure(fg = 'red')
         elif self.long_term != []:
-            i = random.choice(range(len(self.long_term)))
-            self.current.set(self.long_term[i])
-            del self.long_term[i]
+            self.set_new(self.long_term, 'long_time_list.txt')
             self.task_message.configure(fg = 'blue')
         else:
             self.current.set('')
+    def set_new(self, _list, _list_name):
+        i = random.choice(range(len(_list)))
+        self.current.set(_list[i])
+        del _list[i]
+        self.save(_list, _list_name)
 
     def add_long_term(self):
-        if self.str != '':
-            self.long_term.append(self.str.get())
-            self.str.set('')
+        self.add_to_list(self.long_term)
+        self.save(self.long_term, 'long_time_list.txt')
 
     def add_urgent(self):
+        self.add_to_list(self.urgent)
+        self.save(self.urgent, 'urgent_list.txt')
+
+    def add_to_list(self, _list):
         if self.str != '':
-            self.urgent.append(self.str.get())
+            _list.append(self.str.get())
             self.str.set('')
 
+    def save(self, _list, _list_name):
+        f = open(_list_name, 'wb')
+        pickle.dump(_list, f)
+        f.close()
 
 
 if __name__ == '__main__':
