@@ -1,25 +1,17 @@
+#!/usr/bin/env python3
 from tkinter import *
 import random
 import pickle
 
 class ToDoList:
     def __init__(self, *args):
-        try:
-            f1 = open('urgent_list.txt', 'rb')
-            self.urgent = pickle.load(f1) + list(args)
-        except FileNotFoundError:
-            self.urgent = list(args)
-        try:
-            f2 = open('long_time_list.txt', 'rb')
-            self.long_term = pickle.load(f2)
-        except FileNotFoundError:
-            self.long_term = []
-
+        self.urgent = list(args)
+        self.long_term = []
         self.root = Tk()
         self.current = StringVar()
-        self.str = StringVar()
-        self.start()
+        self.str = StringVar() # Entry textvariable
         self.make_widgets()
+        self.start()
         self.root.mainloop()
 
 
@@ -44,20 +36,36 @@ class ToDoList:
         self.root.title('to-do list')
 
     def start(self):
-        if self.urgent != []:
-            self.set_new(self.urgent, 'urgent_list.txt')
-        else:
+        try:
+            f1 = open('urgent_list.txt', 'rb')
+            self.urgent += pickle.load(f1)
+        except FileNotFoundError:
+            pass
+        try:
+            f2 = open('long_time_list.txt', 'rb')
+            self.long_term = pickle.load(f2)
+        except FileNotFoundError:
+            pass
+        try:
+            f3 = open('current.txt', 'rb')
+            self.current.set(pickle.load(f3)) ##
+        except FileNotFoundError:
             self.current.set('')
 
+        if not self.current.get():
+            self.done()
+
     def done(self):
-        if self.urgent != []:
+        if self.urgent:
             self.set_new(self.urgent, 'urgent_list.txt')
             self.task_message.configure(fg = 'red')
-        elif self.long_term != []:
+        elif self.long_term:
             self.set_new(self.long_term, 'long_time_list.txt')
             self.task_message.configure(fg = 'blue')
         else:
             self.current.set('')
+        self.save(self.current.get(), 'current.txt')
+
     def set_new(self, _list, _list_name):
         i = random.choice(range(len(_list)))
         self.current.set(_list[i])
@@ -73,7 +81,7 @@ class ToDoList:
         self.save(self.urgent, 'urgent_list.txt')
 
     def add_to_list(self, _list):
-        if self.str != '':
+        if self.str.get():
             _list.append(self.str.get())
             self.str.set('')
 
