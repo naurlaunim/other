@@ -9,13 +9,6 @@ def E(X):
     '''
     return sum([e[0] * e[1] for e in X])
 
-def Var(X):
-    '''
-    :param X: [(xi, pi), ...]
-    :return: int variance of random variable X
-    '''
-    return E([(e[0]**2, e[1]) for e in X]) - (E(X))**2
-
 
 url = 'https://api.blockchain.info/charts/market-price?timespan=1year&format=json'
 
