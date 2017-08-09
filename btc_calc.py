@@ -26,9 +26,11 @@ for i in range(1, len(values)):
     e2, e1 = values[i], values[i-1]
     dzeta = e2.get('y')/e1.get('y')
     quarter = int(i//91.25)
-    X.append((dzeta-1, P[quarter]/91.25))
-print(E(X))  # revenue per day
+    X.append((dzeta-1, P[quarter]/91))
+if __name__ == '__main__':
+    print(E(X))  # revenue per day
 k = (E(X)) * 30  # revenue per month
 def kbn(month_sum):
     return month_sum/k
-print(1/k)
+if __name__ == '__main__':
+    print(1/k)
